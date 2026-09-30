@@ -250,6 +250,14 @@ public class EventHandler {
             if ((overTopTabs || overBottomTabs) && mouseX >= bounds.left() && mouseX <= bounds.left() + bounds.width()) {
                 return false;
             }
+
+            // Vanilla Backport adds a strip of version buttons down the left edge of the creative
+            // inventory; the buttons are widgets, but the gaps between them would close the screen
+            if (isVanillaBackportLoaded()
+                    && mouseX >= bounds.left() - 30 && mouseX < bounds.left()
+                    && mouseY >= bounds.top() && mouseY <= bounds.top() + bounds.height()) {
+                return false;
+            }
         }
 
         // JEI Compatibility
@@ -285,6 +293,10 @@ public class EventHandler {
 
     private static boolean isJeiLoaded() {
         return net.minecraftforge.fml.ModList.get().isLoaded("jei");
+    }
+
+    private static boolean isVanillaBackportLoaded() {
+        return net.minecraftforge.fml.ModList.get().isLoaded("vanillabackport");
     }
 
     // Indirection so JeiHandler (which references JEI classes) is only loaded when JEI is present
