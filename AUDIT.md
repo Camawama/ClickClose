@@ -4,13 +4,11 @@
 **Scope:** All source files, build scripts, and resources on the `main` branch (Forge 1.20.1, mod v1.0.1).
 Where a finding also applies to the `1.21.1-fabric` branch, it is marked **[also Fabric]**.
 
-> **Verification & resolution pass — 2026-07-18 (this workspace).**
-> Every finding was re-verified against the local workspace (`main` @ `4614839`, which is
-> byte-identical to `Camawama/clickclose` `main` on GitHub, so the audit applied 1:1).
+> **Verification & resolution pass — 2026-07-18.**
+> Every finding was re-verified against `main` @ `4614839`.
 > All items are now **FIXED** on `main` except where noted. Two findings (M1/M2) were
 > **factually wrong** about the 1.20.1 code and have been corrected below — the real bug
-> was worse than described. See also the new "Repository state" section at the bottom:
-> the workspace's git remote pointed at the wrong repository entirely.
+> was worse than described.
 
 ---
 
@@ -22,7 +20,7 @@ awareness of real-world edge cases. The most important problems found are **one 
 gameplay bug** (closing screens without notifying the server) and **one compatibility bug**
 (the mod crashes on Forge versions older than 47.3.10 despite claiming to support `[47,)`).
 The rest is cleanup: Forge MDK template leftovers, a wrong LICENSE file, fragile
-reflection that can be replaced by your own access transformer, and small state bugs.
+reflection that can be replaced by the mod's own access transformer, and small state bugs.
 
 | Severity | Count | Status |
 |----------|-------|--------|
@@ -273,26 +271,7 @@ registration. After fixing `main`, consider porting H1 (the `player.closeContain
 fix) to Fabric too, since that bug exists identically there
 (`EventHandler.java` → `client.setScreen(null)`).
 
-**Still open for Fabric** (not touched in this pass — the branch isn't checked out in
-this workspace): H1 (`player.closeContainer()`), M4 (default `listDisplayed=false`),
+**Still open for Fabric** (not touched in this pass): H1 (`player.closeContainer()`), M4 (default `listDisplayed=false`),
 L1 (LICENSE), L5 (lang file), L8 (log-once). Note that 1.21.1 rewrote
 `RecipeBookComponent`, so the M1/M2 correction above is specific to 1.20.1 — re-verify
 field names there before porting anything recipe-book related.
-
----
-
-## Repository state (found during this pass — outside the original audit scope)
-
-The workspace's `origin` remote pointed at **`https://github.com/Camawama/FullStop.git`**
-— a completely different mod. That is why git reported "diverged: 4 and 25 different
-commits": the 25 "incoming" commits were FullStop's history (no common ancestor at all),
-and pulling them would have merged an unrelated project into this one.
-
-The real repo `Camawama/clickclose` exists and its `main` (`4614839`) is **identical**
-to the local pre-audit HEAD — nothing was actually out of sync. To repair (blocked by
-tool permissions in this session, run manually):
-
-```
-git remote set-url origin https://github.com/Camawama/clickclose.git
-git fetch --all --prune
-```
